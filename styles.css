@@ -1,0 +1,132 @@
+:root{
+  --bg:#000000; --panel:#121933; --muted:#8aa0ff; --text:#e7ecff;
+  --accent:#7ad7ff; --accent2:#d17bff; --ok:#55e6a5; --warn:#ffba5a;
+  --card:#0f1530; --ring: rgba(122,215,255,0.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans",sans-serif;background:#000000;color:var(--text);}
+a{color:var(--accent)}
+
+.container{max-width:1100px;margin:0 auto;padding:24px}
+header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}
+h1{font-size:clamp(1.6rem,2.5vw,2.2rem);margin:0;letter-spacing:0.3px}
+.sub{opacity:.8;font-size:0.95rem}
+
+.grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+@media (max-width: 960px){.grid{grid-template-columns:1fr;}}
+
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.card h2{font-size:1.05rem;margin:.2rem 0 .6rem 0;color:#cfe2ff}
+
+.control{display:grid;grid-template-columns:120px 1fr minmax(120px,160px);gap:12px;align-items:center;padding:10px;border-radius:12px;background:var(--card);border:1px solid rgba(255,255,255,0.06);margin:8px 0}
+.control label{font-size:.92rem;color:#c9d4ff;opacity:.95}
+.control input[type="range"]{width:100%}
+.control input[type="number"], .control input[type="text"]{width:100%;padding:8px 10px;border-radius:10px;background:#0c1229;color:var(--text);border:1px solid rgba(255,255,255,0.08)}
+.control input:focus{outline:none;box-shadow:0 0 0 4px var(--ring)}
+
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.btn{appearance:none;border:none;background:linear-gradient(180deg, #2a3b8f, #1b255e);border:1px solid rgba(255,255,255,0.1);color:#e9f0ff;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{background:linear-gradient(180deg, #283049, #1b2233)}
+
+/* Dropdown contrast improvements */
+select.btn.secondary, select.btn.secondary:focus {
+  background: #e0e4ea;
+  color: #222;
+  border: 1px solid var(--accent2);
+}
+select.btn.secondary option {
+  background: #e0e4ea;
+  color: #222;
+}
+select.btn.secondary:hover, select.btn.secondary:active {
+  background: #cfd4db;
+}
+select.btn.secondary {
+  background: linear-gradient(180deg, #283049, #1b2233);
+  color: #e7ecff;
+  border: 1px solid var(--accent2);
+}
+select.btn.secondary:focus {
+  outline: 2px solid var(--accent2);
+}
+select.btn.secondary option {
+  background: #e0e4ea !important;
+  color: #222 !important;
+}
+
+/* Improve dropdown contrast for open state */
+select.btn.secondary, select.btn.secondary:focus {
+  background: linear-gradient(180deg, #283049, #1b2233);
+  color: #e7ecff;
+  border: 1px solid var(--accent2);
+}
+select.btn.secondary option {
+  background: #121933;
+  color: #e7ecff;
+}
+.btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,0.25)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.06);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);font-size:.85rem}
+.badge{font-size:.78rem;opacity:.8}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media (max-width: 700px){.kpi-grid{grid-template-columns:1fr}}
+.kpi{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:14px}
+.kpi h3{margin:.1rem 0 .35rem 0;font-weight:700;font-size:.95rem;color:#dbe4ff}
+.kpi .big{font-variant-numeric:tabular-nums;letter-spacing:0.3px;font-size:1.1rem}
+.muted{opacity:.75}
+
+.foot{opacity:.7;font-size:.9rem;margin-top:10px}
+.note{font-size:.85rem;opacity:.8}
+
+.result-panel{display:grid;gap:10px}
+.result{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(122,215,255,0.08), rgba(122,215,255,0.03));border:1px solid rgba(122,215,255,0.35)}
+.result .title{font-weight:700;color:#cbe9ff;margin-bottom:6px}
+
+.flexbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin:10px 0 6px 0}
+.right{display:flex;gap:10px;align-items:center}
+.tiny{font-size:.8rem;opacity:.8}
+
+.hl{color:var(--ok)}
+.warn{color:var(--warn)}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:.85rem;background:#0c1229;border:1px solid rgba(255,255,255,0.08);padding:8px 10px;border-radius:8px}
+
+/* Galaxy viz */
+.viz-card{position:relative; overflow:hidden}
+.viz-toolbar{display:flex; gap:10px; align-items:center; margin:6px 0 10px 0}
+.viz-toolbar #vizResetView {
+  margin-left: auto;
+}
+.viz-toolbar label{font-size:.85rem; opacity:.9}
+.viz-wrap{position:relative; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); background:#000000}
+canvas#galaxy{width:100%; height:360px; display:block; background:#000000}
+
+.viz-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--accent2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  min-width: 180px;
+  max-width: 320px;
+  opacity: 0.97;
+  transition: opacity 0.12s;
+  z-index: 1000;
+}
+
+/* Copy fallback UI */
+.copybox{display:none;margin-top:8px}
+.copybox.show{display:block}
+.copybox input{width:100%;padding:8px 10px;border-radius:10px;background:#0c1229;color:var(--text);border:1px solid rgba(255,255,255,0.18)}
+.copybox .tiny{display:block;margin-top:6px}
+
+/* Test log */
+.testpass{color:var(--ok);font-weight:600}
+.testfail{color:#ff6b6b;font-weight:600}

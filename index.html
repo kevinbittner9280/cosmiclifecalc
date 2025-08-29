@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cosmic Life Calculator</title>
+  <meta name="description" content="Interactive, client-side calculator estimating planets, planetary systems, and life-bearing worlds across the observable universe." />
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <div id="var-tooltips"></div>
+    <header>
+      <div>
+        <h1>Cosmic Life Calculator</h1>
+        <div class="sub">Estimate planets, planetary systems, and life-bearing worlds across the observable universe.</div>
+      </div>
+      <div class="right">
+        <button class="btn secondary" id="btnShare" type="button">Share link</button>
+        <button class="btn ghost" id="btnReset" type="button">Reset</button>
+      </div>
+    </header>
+
+    <div id="copyFallback" class="copybox" aria-live="polite">
+      <input id="copyInput" readonly value="" aria-label="Copy this URL manually" />
+      <span class="tiny">Copy blocked by your browser. URL selected — use <b>Ctrl/Cmd + C</b> to copy.</span>
+    </div>
+
+    <div class="grid">
+      <!-- Controls -->
+      <section class="card" aria-labelledby="controls-h2">
+        <h2 id="controls-h2">Inputs</h2>
+        <div class="row" style="margin-bottom:8px">
+          <span class="pill">Presets:</span>
+          <button class="btn" data-preset="conservative" type="button">Conservative</button>
+          <button class="btn" data-preset="moderate" type="button">Moderate</button>
+          <button class="btn" data-preset="optimistic" type="button">Optimistic</button>
+          <button class="btn secondary" data-preset="rare" type="button">Rare-Earth</button>
+        </div>
+
+        <div class="control">
+          <label for="galaxies" data-tooltip="Estimated number of galaxies in the observable universe.">Galaxies (observable universe)</label>
+          <input id="galaxiesRange" type="range" min="1e10" max="2e12" step="1e9"/>
+          <input id="galaxies" type="text" inputmode="decimal" aria-describedby="galaxiesHelp"/>
+        </div>
+        <div class="note" id="galaxiesHelp">Tip: accepts scientific notation (e.g., 2e11). Range covers ~10B – 2T.</div>
+
+        <div class="control">
+          <label for="avgStars" data-tooltip="Average number of stars per galaxy. Milky Way ≈ 1–4×10¹¹.">Avg stars per galaxy</label>
+          <input id="avgStarsRange" type="range" min="1e7" max="5e11" step="1e7"/>
+          <input id="avgStars" type="text" inputmode="decimal" aria-describedby="avgStarsHelp"/>
+        </div>
+        <div class="note" id="avgStarsHelp">From dwarf (~10⁷) to giant spirals/ellipticals (~10¹²). Milky Way ≈ 1–4×10¹¹.</div>
+
+        <div class="control">
+          <label for="mu" data-tooltip="Average number of planets per star, including all types.">Average planets per star (μ)</label>
+          <input id="muRange" type="range" min="0" max="3" step="0.01"/>
+          <input id="mu" type="number" min="0" max="100" step="0.01"/>
+        </div>
+
+        <div class="control">
+          <label for="fp" data-tooltip="Fraction of stars that have at least one planet.">Fraction of stars with ≥1 planet (fₚ)</label>
+          <input id="fpRange" type="range" min="0" max="1" step="0.01"/>
+          <input id="fp" type="number" min="0" max="1" step="0.01"/>
+        </div>
+
+        <div class="control">
+          <label for="fhab" data-tooltip="Fraction of planets considered potentially habitable.">Habitability fraction (f_hab)</label>
+          <input id="fhabRange" type="range" min="0" max="0.5" step="0.001"/>
+          <input id="fhab" type="number" min="0" max="1" step="0.001"/>
+        </div>
+        <div class="control">
+          <label for="fbioDropdown" data-tooltip="Probability that life arises and persists on a habitable planet.">Abiogenesis & persistence (f_bio)</label>
+          <select id="fbioDropdown" class="btn secondary" style="padding:6px 10px;">
+            <option value="1e-16">1e-16</option>
+            <option value="1e-15">1e-15</option>
+            <option value="1e-14">1e-14</option>
+            <option value="1e-13">1e-13</option>
+            <option value="1e-12">1e-12</option>
+            <option value="1e-11">1e-11</option>
+            <option value="1e-10">1e-10</option>
+            <option value="1e-9">1e-9</option>
+            <option value="1e-8">1e-8</option>
+            <option value="1e-7">1e-7</option>
+            <option value="1e-6">1e-6</option>
+          </select>
+          <input id="fbio" type="number" min="0" max="1" step="1e-6" style="width:100%;" readonly />
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <span class="badge">m (planets/system) is derived: m = μ / fₚ</span>
+        </div>
+      </section>
+
+      <!-- Results -->
+      <section class="card" aria-labelledby="results-h2">
+        <h2 id="results-h2">Results</h2>
+        <div class="kpi-grid">
+          <div class="kpi">
+            <h3>Total stars</h3>
+            <div class="big" id="starsOut">—</div>
+            <div class="muted tiny" id="starsOutWords">&nbsp;</div>
+          </div>
+          <div class="kpi">
+            <h3>Total planets</h3>
+            <div class="big" id="planetsOut">—</div>
+            <div class="muted tiny" id="planetsOutWords">&nbsp;</div>
+          </div>
+          <div class="kpi">
+            <h3>Planetary systems</h3>
+            <div class="big" id="systemsOut">—</div>
+            <div class="muted tiny" id="systemsOutWords">&nbsp;</div>
+          </div>
+          <div class="kpi">
+            <h3>Planets per system (m)</h3>
+            <div class="big" id="mOut">—</div>
+            <div class="muted tiny">Derived from μ and fₚ</div>
+          </div>
+        </div>
+        <br>
+        <div class="result-panel">
+          <div class="result">
+            <div class="title">Estimated habitable planets</div>
+            <div class="big" id="habOut" style="font-size:1.05rem"></div>
+            <div class="muted tiny" id="habOutWords"></div>
+            <br>
+            <div class="title">Estimated life-bearing worlds</div>
+            <div class="big" id="lifeOut" style="font-size:1.15rem"></div>
+            <div class="muted tiny" id="lifeOutWords"></div>
+          </div>
+          <div class="tiny">Formulae used:
+            <div class="code">Stars = Galaxies × AvgStars<br/>Planets = μ × Stars<br/>Systems = fₚ × Stars<br/>m = μ / fₚ<br/>Life = Planets × f_hab × f_bio</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Galaxy Visualization -->
+    <section class="card viz-card" aria-labelledby="viz-h2" style="margin-top:14px">
+      <h2 id="viz-h2">Spiral Galaxy (lightweight render)</h2>
+      <div class="viz-toolbar">
+        <label style="margin-right:12px;"><input type="checkbox" id="vizAnimate" unchecked /> Animate</label>
+        <div style="display:flex; gap:14px; align-items:center;">
+          <label for="vizQuality" style="display:flex; align-items:center; gap:6px;">Quality
+            <select id="vizQuality" class="btn secondary" style="padding:6px 10px; margin-left:4px;">
+              <option value="low" title="Fastest, least detailed.">Low</option>
+              <option value="med" selected title="Balanced for most devices.">Medium</option>
+              <option value="high" title="High: May be slow on some devices/browsers.">High</option>
+            </select>
+          </label>
+          <label for="vizHiRes" style="display:flex; align-items:center; gap:6px;">Canvas Resolution
+            <select id="vizHiRes" class="btn secondary" style="padding:6px 10px; margin-left:4px;">
+              <option value="4" selected>1×</option>
+              <option value="6">2×</option>
+            </select>
+          </label>
+        </div>
+        <label>Palette
+          <select id="vizPalette" class="btn secondary" style="padding:6px 10px">
+            <option value="ice" selected>Ice</option>
+            <option value="sunset">Sunset</option>
+            <option value="violet">Violet</option>
+            <option value="aurora">Aurora</option>
+            <option value="nebula">Nebula</option>
+            <option value="gold">Gold</option>
+            <option value="emerald">Emerald</option>
+            <option value="ruby">Ruby</option>
+            <option value="ocean">Ocean</option>
+            <option value="mono">Mono</option>
+          </select>
+        </label>
+  <button class="btn" id="vizRegen" type="button">Regenerate</button>
+  <button class="btn" id="vizDownload" type="button">Download PNG</button>
+  <button class="btn secondary" id="vizResetView" type="button">Reset View</button>
+      </div>
+      <div class="viz-wrap">
+  <canvas id="galaxy" width="900" height="360" aria-label="Decorative spiral galaxy visualization"></canvas>
+      </div>
+      <div class="tiny muted" style="margin-top:6px">Tip: Turn off animation or use Low quality on low-power devices. Render is cached to minimize CPU/GPU use.</div>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <div class="flexbar">
+        <div class="pill">About</div>
+        <div class="right tiny">All computations run in your browser • Shareable via URL parameters</div>
+      </div>
+      <p class="foot">This calculator is intentionally agnostic about exact priors. Use it to explore how different assumptions shape outcomes. Reasonable literature-inspired ranges might be: galaxies 2e11–2e12; average stars per galaxy 1e9–1e11; μ≈1–2; fₚ≈0.8–1.0; f_hab≈0.01–0.2 depending on definitions; f_bio is deeply uncertain (try 1e-12 … 1e-6 or beyond).</p>
+    </section>
+
+    <!-- Diagnostics & Tests -->
+    <section class="card" style="margin-top:14px" aria-labelledby="tests-h2">
+      <h2 id="tests-h2">Diagnostics & Self-Tests</h2>
+      <div class="row">
+        <button class="btn" id="runTests" type="button">Run self-tests</button>
+        <span class="tiny">(Non-destructive; restores your inputs afterwards)</span>
+      </div>
+      <ul id="testLog" class="tiny"></ul>
+    </section>
+  </div>
+
+  <div id="starTooltip" class="viz-tooltip" style="display:none;position:fixed;z-index:1000;"></div>
+  <script src="app.js" defer></script>
+  <script>
+    // Custom tooltip logic for variable labels
+    document.addEventListener('DOMContentLoaded', function() {
+      const tooltip = document.createElement('div');
+      tooltip.id = 'custom-tooltip';
+      tooltip.style.position = 'fixed';
+      tooltip.style.zIndex = '9999';
+      tooltip.style.background = 'rgba(18,25,51,0.98)';
+      tooltip.style.color = '#e7ecff';
+      tooltip.style.border = '2px solid #d17bff';
+      tooltip.style.borderRadius = '10px';
+      tooltip.style.padding = '10px 14px';
+      tooltip.style.fontSize = '0.95rem';
+      tooltip.style.boxShadow = '0 4px 16px rgba(0,0,0,0.25)';
+      tooltip.style.maxWidth = '320px';
+      tooltip.style.opacity = '0';
+      tooltip.style.pointerEvents = 'none';
+      tooltip.style.transition = 'opacity 0.12s';
+      document.body.appendChild(tooltip);
+
+      function showTooltip(e) {
+        const text = e.target.getAttribute('data-tooltip');
+        if (!text) return;
+        tooltip.textContent = text;
+        tooltip.style.opacity = '0.97';
+        const rect = e.target.getBoundingClientRect();
+        // For position: fixed, use viewport coordinates only
+        let top = rect.bottom + 8;
+        let left = rect.left;
+        // Temporarily set position to get tooltip size
+        tooltip.style.top = '0px';
+        tooltip.style.left = '0px';
+        const tooltipRect = tooltip.getBoundingClientRect();
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+      }
+      function hideTooltip() {
+        tooltip.style.opacity = '0';
+      }
+      document.querySelectorAll('label[data-tooltip]').forEach(label => {
+        label.addEventListener('mouseenter', showTooltip);
+        label.addEventListener('mouseleave', hideTooltip);
+        label.addEventListener('focus', showTooltip);
+        label.addEventListener('blur', hideTooltip);
+      });
+    });
+  </script>
+</body>
+</html>
